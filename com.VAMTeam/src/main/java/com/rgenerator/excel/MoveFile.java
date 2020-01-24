@@ -8,6 +8,7 @@ import java.net.URL;
 import java.security.CodeSource;
 import java.util.Properties;
 
+import com.VAMTeam.ExecutionLoger;
 import com.rgenerator.db.DbConnProvider;
 
 public class MoveFile {
@@ -16,6 +17,7 @@ public class MoveFile {
 
 	String windowsDirectory = "";
 	String unixDirectory = "";
+	ExecutionLoger loger;
 
 	public String createFolder(String foldername, String rootDir) {
 
@@ -32,7 +34,7 @@ public class MoveFile {
 			CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
 			URL url = null;
 			if (codeSource != null) {
-				url = new URL(codeSource.getLocation(), "application.properties");
+				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
 			}
 			inputStream = new FileInputStream(url.getFile());
 			if (inputStream == null) {
@@ -50,6 +52,7 @@ public class MoveFile {
 		String osname = System.getProperty("os.name", "").toLowerCase();
 
 		if (osname.startsWith("windows")) {
+			loger.logger_start();
 			System.out.println("Hello " + osname);
 
 			reportFolder = new File(windowsDirectory + reportFolderName);

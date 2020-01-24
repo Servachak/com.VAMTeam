@@ -26,7 +26,7 @@ public class ExecutionLoger {
 
 	public Logger logger_start() {
 
-		dateFormat = new SimpleDateFormat("dd_MM_yyyy_HH_mm_ss_ms");
+		dateFormat = new SimpleDateFormat("dd_MM_yyyy_HH_mm_");
 		date = new Date();
 		logger = Logger.getLogger("MyLog");
 

@@ -37,7 +37,7 @@ public class DbConnProvider {
 			CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
 			URL url = null;
 			if (codeSource != null) {
-				url = new URL(codeSource.getLocation(), "application.properties");
+				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
 			}
 			inputStream = new FileInputStream(url.getFile());
 			if (inputStream == null) {
@@ -68,7 +68,7 @@ public class DbConnProvider {
 			CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
 			URL url = null;
 			if (codeSource != null) {
-				url = new URL(codeSource.getLocation(), "application.properties");
+				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
 			}
 			inputStream = new FileInputStream(url.getFile());
 			if (inputStream == null) {
