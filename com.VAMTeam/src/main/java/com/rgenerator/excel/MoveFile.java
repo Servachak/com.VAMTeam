@@ -3,21 +3,20 @@ package com.rgenerator.excel;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.security.CodeSource;
 import java.util.Properties;
-
-import com.VAMTeam.ExecutionLoger;
-import com.rgenerator.db.DbConnProvider;
+import java.util.logging.Logger;
+import com.VAMTeam.ExecutionLogger;
 
 public class MoveFile {
 
+	public static CodeSource codeSource;
+	public static URL url = null;
 	private FileInputStream inputStream;
 
 	String windowsDirectory = "";
 	String unixDirectory = "";
-	ExecutionLoger loger;
 
 	public String createFolder(String foldername, String rootDir) {
 
@@ -30,12 +29,16 @@ public class MoveFile {
 	public String createDirectory() {
 
 		Properties properties = new Properties();
+		ExecutionLogger executionLoggerLogger = new ExecutionLogger();
+		Logger logger = executionLoggerLogger.logger_start();
+
 		try {
-			CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
-			URL url = null;
+
+			codeSource = getClass().getProtectionDomain().getCodeSource();
 			if (codeSource != null) {
 				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
 			}
+
 			inputStream = new FileInputStream(url.getFile());
 			if (inputStream == null) {
 				System.out.println("Sorry, unable to find ");
@@ -52,12 +55,13 @@ public class MoveFile {
 		String osname = System.getProperty("os.name", "").toLowerCase();
 
 		if (osname.startsWith("windows")) {
-			loger.logger_start();
+
 			System.out.println("Hello " + osname);
 
 			reportFolder = new File(windowsDirectory + reportFolderName);
 			reportFolder.exists();
 			reportFolder.mkdir();
+			logger.info(windowsDirectory + reportFolderName + " is created");
 
 		} else if (osname.startsWith("linux")) {
 			System.out.println("Hello " + osname);
@@ -65,6 +69,7 @@ public class MoveFile {
 			reportFolder = new File(unixDirectory + reportFolderName);
 			reportFolder.exists();
 			reportFolder.mkdir();
+			logger.info(unixDirectory + reportFolderName + reportFolder + "directory is created");
 
 		} else {
 			System.out.println("Sorry, your operating system is different");

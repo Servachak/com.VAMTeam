@@ -9,6 +9,7 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 import com.ibm.db2.jcc.am.Connection;
+import com.rgenerator.excel.MoveFile;
 
 public class DbConnProvider {
 
@@ -34,11 +35,9 @@ public class DbConnProvider {
 	public void connectionToFirstDB() {
 
 		try {
-			CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
-			URL url = null;
-			if (codeSource != null) {
-				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
-			}
+
+			URL url = MoveFile.url;
+
 			inputStream = new FileInputStream(url.getFile());
 			if (inputStream == null) {
 				System.out.println("Sorry, unable to find ");
@@ -65,11 +64,9 @@ public class DbConnProvider {
 	public void connectionToSecondtDB() {
 
 		try {
-			CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
-			URL url = null;
-			if (codeSource != null) {
-				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
-			}
+
+			URL url = MoveFile.url;
+
 			inputStream = new FileInputStream(url.getFile());
 			if (inputStream == null) {
 				System.out.println("Sorry, unable to find ");

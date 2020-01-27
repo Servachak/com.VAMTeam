@@ -2,11 +2,18 @@ package com.rgenerator.excel;
 
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.logging.FileHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
+import com.VAMTeam.ExecutionLogger;
 import com.ibm.db2.jcc.am.Connection;
 import com.ibm.db2.jcc.am.ResultSet;
 import com.rgenerator.db.DbConnProvider;
@@ -53,6 +60,8 @@ public class ExcelSaveData {
 	private Workbook workbook;
 	private FileOutputStream fileOut;
 
+	ExecutionLogger executionLogger;
+
 	public ExcelSaveData() {
 		moveFile = new MoveFile();
 		directoryName = moveFile.createDirectory();
@@ -70,7 +79,9 @@ public class ExcelSaveData {
 
 	private void saveAccToSheet(Workbook workbook, ResultSet ACCdata, String ACCname, String currency,
 			String reportName, String reportPeriod) {
+
 		try {
+
 			ResultSetMetaData data = ACCdata.getMetaData();
 			int columnCount = data.getColumnCount();
 			int currentRow = 4;
@@ -251,6 +262,7 @@ public class ExcelSaveData {
 			for (int i = 0; i < cellcount; i++) { // Autosize columns
 				sheet.autoSizeColumn(i);
 			}
+
 		} catch (SQLException ex) {
 			System.err.println("SQLException information");
 			while (ex != null) {
@@ -261,6 +273,9 @@ public class ExcelSaveData {
 				ex.printStackTrace();
 				ex = ex.getNextException(); // For drivers that support chained exceptions
 			}
+		} catch (SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
 	}
@@ -787,6 +802,12 @@ public class ExcelSaveData {
 			System.out.println("--------------Monthly-------------");
 			reportName = "Monthly";
 			saveDirectory = folderForMonthlyRepotrs;
+
+			executionLogger = new ExecutionLogger();
+			Logger logger = executionLogger.logger_start();
+
+			logger.info("--------------Monthly-------------");
+
 		}
 
 		// For excel file
