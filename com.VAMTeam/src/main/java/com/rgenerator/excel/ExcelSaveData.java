@@ -70,6 +70,7 @@ public class ExcelSaveData {
 			try {
 				while (weeklyHier.next()) {
 					weekly.getHierarchyReport(weeklyHier.getString(1), fromDate, toDate, 1);
+					LOGGER.info("execution weekly report");
 				}
 			} catch (SQLException ex) {
 				System.err.println("SQLException information");

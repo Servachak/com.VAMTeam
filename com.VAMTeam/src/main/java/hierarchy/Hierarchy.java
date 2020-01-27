@@ -178,6 +178,7 @@ public class Hierarchy {
 			}
 			if (book.getNumberOfSheets() != 0) {
 				try {
+					logger.info("File name: " + fileName);
 					System.out.println("File name: " + fileName);
 					FileOutputStream fileOut = new FileOutputStream(
 							saveFolder + "/" + fileName + "_" + formatter.format(toDate) + "(" + reportName + ").xls");
@@ -240,7 +241,8 @@ public class Hierarchy {
 	}
 
 	private void saveACC(Workbook workbook, ArrayList<Interest> ACCdata, String ACCname, String reportName) {
-
+		System.out.println(reportName);
+		
 		Sheet sheet = workbook.createSheet(ACCname);
 		// Create header information
 		String reportPeriod = formatter.format(ACCdata.get(0).getToDate().toLocalDate()) + " - "
@@ -452,7 +454,7 @@ public class Hierarchy {
 			sheet.autoSizeColumn(i);
 		}
 
-		logger.info("excel was created");
+		logger.info("Excel was created for :" + reportName);
 	}
 
 	private class AccountCollection {

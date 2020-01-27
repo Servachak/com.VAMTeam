@@ -75,7 +75,7 @@ public class MoveFile {
 			reportFolder = new File(unixDirectory + reportFolderName);
 			reportFolder.exists();
 			reportFolder.mkdir();
-			lOGGER.info(unixDirectory + reportFolderName + reportFolder + "directory is created");
+			lOGGER.info(unixDirectory + reportFolderName + reportFolder + " directory is created");
 
 		} else {
 			System.out.println("Sorry, your operating system is different");
