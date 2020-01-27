@@ -1,4 +1,4 @@
-package com.VAMTeam;
+package vamTeam;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -10,8 +10,6 @@ import java.util.logging.FileHandler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
-
-import com.rgenerator.excel.MoveFile;
 
 public class ExecutionLogger {
 
@@ -27,7 +25,6 @@ public class ExecutionLogger {
 
 	public static CodeSource codeSource;
 	private FileInputStream fileInputStream;
-	private URL url = MoveFile.url;
 
 	Properties properties = new Properties();
 	private static final String format = "[%1$tF %1$tT] [%2$-7s] %3$s %n";
@@ -36,9 +33,10 @@ public class ExecutionLogger {
 
 		try {
 			// This block configure the logger with handler and formatter
+			URL url = null;
 			codeSource = getClass().getProtectionDomain().getCodeSource();
 			if (codeSource != null) {
-				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
+				url = new URL(codeSource.getLocation(), "application.properties");
 			}
 			fileInputStream = new FileInputStream(url.getFile());
 			properties.load(fileInputStream);
@@ -49,8 +47,7 @@ public class ExecutionLogger {
 
 			fileHandler.setFormatter(new SimpleFormatter() {
 				public synchronized String format(LogRecord lr) {
-					return String.format(format, new Date(lr.getMillis()), 
-							lr.getLevel().getLocalizedName(),
+					return String.format(format, new Date(lr.getMillis()), lr.getLevel().getLocalizedName(),
 							lr.getMessage());
 				}
 			});

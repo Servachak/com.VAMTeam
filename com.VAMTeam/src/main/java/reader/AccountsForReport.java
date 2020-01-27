@@ -1,4 +1,4 @@
-package com.reader;
+package reader;
 
 import java.util.ArrayList;
 import java.sql.SQLException;
