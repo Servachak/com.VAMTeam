@@ -51,6 +51,7 @@ public class Hierarchy {
 	private String directoryName;
 	private String folderForMonthlyRepotrs;
 	private String folderForWeeklyRepotrs;
+	private String folderForQuartalRepotrs;
 	private String saveFolder;
 	private Logger logger = ExcelSaveData.LOGGER;
 
@@ -59,14 +60,16 @@ public class Hierarchy {
 	public Hierarchy() {
 		MoveFile moveFile = new MoveFile();
 		directoryName = moveFile.createDirectory();
-		folderForMonthlyRepotrs = moveFile.createFolder("MONTHLY", directoryName);
-		folderForWeeklyRepotrs = moveFile.createFolder("WEEKLY", directoryName);
+		folderForMonthlyRepotrs = moveFile.createFolder("MONTHLY REPORTS", directoryName);
+		folderForWeeklyRepotrs = moveFile.createFolder("WEEKLY REPORTS", directoryName);
+		folderForQuartalRepotrs = moveFile.createFolder("QUARTAL REPORTS", directoryName);
 
 	}
 
 	private String getType(String accID) {
 		String type = "";
 		for (int i = 0; i < hier.size(); i++)
+
 			if (hier.get(i).getACC_ID().equals(accID)) {
 				type = hier.get(i).getACCTYPE_CATEGORY();
 				break;
@@ -106,9 +109,12 @@ public class Hierarchy {
 		if (reportType == 1) {// Weekly
 			this.reportName = "Weekly";
 			saveFolder = folderForWeeklyRepotrs;
-		} else {// Monthly
+		} else if (reportType == 2) {// Monthly
 			this.reportName = "Monthly";
 			saveFolder = folderForMonthlyRepotrs;
+		} else {
+			this.reportName = "Quarterly";
+			saveFolder = folderForQuartalRepotrs;
 		}
 		formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		server = new DbConnProvider();
@@ -203,24 +209,43 @@ public class Hierarchy {
 		LocalDate to = toDate;
 		try {
 			ResultSet acc_result;
-			if (reportType == 1)
+
+			if (reportType == 1) {
 				acc_result = dataProvider.weeklyEntriesData(accID, to.toString());
-			else
+			}
+
+			else if (reportType == 2) {
 				acc_result = dataProvider.monthlyEntriesData(accID, to.toString());
+			}
+
+			else {
+				acc_result = dataProvider.quarterEntriesData(accID, from.toString(), to.toString());
+			}
+
 			if (acc_result.next()) {
+				
 				if (acc_result.getString(3).compareTo(toDate.toString()) > 0) {
 					return new ArrayList<Interest>(); // no interest were found
+					
 				} else {
 
 					if (acc_result.getString(3).compareTo(fromDate.toString()) > 0) {
 						from = Date.valueOf(acc_result.getString(3)).toLocalDate();
-						// System.out.println("<<<<<<" + from.toString());
+						
 					}
-
 				}
 			} else
 				return new ArrayList<Interest>();
-
+			
+			if (reportType == 3) {
+				to = Date.valueOf(acc_result.getString(4)).toLocalDate();
+				while (acc_result.next()) {
+					if (acc_result.getString(4).compareTo(to.toString()) > 0) {
+						from = Date.valueOf(acc_result.getString(3)).toLocalDate();
+					}
+				}
+			}
+			
 		} catch (SQLException ex) {
 			System.err.println("SQLException information");
 			logger.warning("SQLException information");
@@ -242,7 +267,7 @@ public class Hierarchy {
 
 	private void saveACC(Workbook workbook, ArrayList<Interest> ACCdata, String ACCname, String reportName) {
 		System.out.println(reportName);
-		
+
 		Sheet sheet = workbook.createSheet(ACCname);
 		// Create header information
 		String reportPeriod = formatter.format(ACCdata.get(0).getToDate().toLocalDate()) + " - "
