@@ -33,7 +33,7 @@ public class DbDataProvider {
 	}
 
 	public ResultSet getDetailsData(String account, String dateFrom, String dateTo) {
-		return dataProvider("SELECT DISTINCT\r\n"
+		return dataProvider("SELECT \r\n"
 				+ "	ard.ACC_ID AS \"Account number\",\r\n"
 				+ "	a.ACC_NAME AS \"Account Name\",\r\n" 
 				+ "	ard.BANK_ID AS \"Bank_ID\",\r\n"
