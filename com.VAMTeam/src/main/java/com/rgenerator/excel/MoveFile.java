@@ -39,7 +39,7 @@ public class MoveFile {
 
 			codeSource = getClass().getProtectionDomain().getCodeSource();
 			if (codeSource != null) {
-				url = new URL(codeSource.getLocation(), "application.properties");
+				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
 			}
 
 			inputStream = new FileInputStream(url.getFile());

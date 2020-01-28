@@ -36,7 +36,7 @@ public class ExecutionLogger {
 			URL url = null;
 			codeSource = getClass().getProtectionDomain().getCodeSource();
 			if (codeSource != null) {
-				url = new URL(codeSource.getLocation(), "application.properties");
+				url = new URL(codeSource.getLocation(), "conf/reportgenerator.properties");
 			}
 			fileInputStream = new FileInputStream(url.getFile());
 			properties.load(fileInputStream);
