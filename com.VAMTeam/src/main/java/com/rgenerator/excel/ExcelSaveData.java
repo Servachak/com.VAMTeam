@@ -20,24 +20,27 @@ public class ExcelSaveData {
 	private DbDataProvider dataProvider;
 	private ExecutionLogger executionLogger;
 	public static Logger LOGGER;
-
-	public void startMonthlyReporting(LocalDate fromDate, LocalDate toDate) {
+	
+	public ExcelSaveData() {
 		executionLogger = new ExecutionLogger();
 		LOGGER = executionLogger.logger_start();
+	}
+
+	public void startMonthlyReporting(LocalDate fromDate, LocalDate toDate) {
 		server = new DbConnProvider();
 		server.connectionToFirstDB();
 		connection = server.openConn();
 
 		// add logger
 		dataProvider = new DbDataProvider(connection);
-
+		LOGGER.info("Start monthly reporting");
 		if (connection != null) {
 			ResultSet monthlyHier = dataProvider.getMonthlyHierarchies(toDate.toString());
 			Hierarchy monthly = new Hierarchy();
 			try {
 				while (monthlyHier.next()) {
 					monthly.getHierarchyReport(monthlyHier.getString(1), fromDate, toDate, 2);
-					LOGGER.info("execution montly report");
+					LOGGER.info("Executing monthly report\nHIER_ID: " + monthlyHier.getString(1));
 				}
 			} catch (SQLException ex) {
 				System.err.println("SQLException information");
@@ -56,6 +59,7 @@ public class ExcelSaveData {
 			}
 		}
 		server.endConn(connection);
+		LOGGER.info("Finish monthly reporting");
 
 	}
 
@@ -64,13 +68,14 @@ public class ExcelSaveData {
 		server.connectionToFirstDB();
 		connection = server.openConn();
 		dataProvider = new DbDataProvider(connection);
+		LOGGER.info("Start weekly reporting");
 		if (connection != null) {
 			ResultSet weeklyHier = dataProvider.getWeeklyHierarchies(toDate.toString());
 			Hierarchy weekly = new Hierarchy();
 			try {
 				while (weeklyHier.next()) {
 					weekly.getHierarchyReport(weeklyHier.getString(1), fromDate, toDate, 1);
-					LOGGER.info("execution weekly report");
+					LOGGER.info("Executing weekly report\nHIER_ID: " + weeklyHier.getString(1));
 				}
 			} catch (SQLException ex) {
 				System.err.println("SQLException information");
@@ -89,6 +94,7 @@ public class ExcelSaveData {
 			}
 		}
 		server.endConn(connection);
+		LOGGER.info("Finish weekly reporting");
 	}
 
 	public void startQuarterReporting(LocalDate fromDate, LocalDate toDate) {
@@ -96,12 +102,14 @@ public class ExcelSaveData {
 		server.connectionToFirstDB();
 		connection = server.openConn();
 		dataProvider = new DbDataProvider(connection);
+		LOGGER.info("Start quarterly reporting");
 		if(connection!=null) {
-			ResultSet quarterHier = dataProvider.getQuarterHierarchies(fromDate.toString(), toDate.toString());
+			ResultSet quarterHier = dataProvider.getQuarterHierarchies(toDate.toString());
 			Hierarchy quarter = new Hierarchy();
 			try {
 				while(quarterHier.next()) {
 					quarter.getHierarchyReport(quarterHier.getString(1), fromDate, toDate, 3);
+					LOGGER.info("Executing quarterly report (HIER_ID: " + quarterHier.getString(1)+")");
 				}
 			} catch (SQLException ex) {
 				System.err.println("SQLException information");
@@ -120,6 +128,7 @@ public class ExcelSaveData {
 			}
 		}
 		server.endConn(connection);
+		LOGGER.info("Finish quarterly reporting");
 		
 	}
 }

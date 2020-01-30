@@ -51,7 +51,7 @@ public class Hierarchy {
 	private String directoryName;
 	private String folderForMonthlyRepotrs;
 	private String folderForWeeklyRepotrs;
-	private String folderForQuartalRepotrs;
+	private String folderForQuarterRepotrs;
 	private String saveFolder;
 	private Logger logger = ExcelSaveData.LOGGER;
 
@@ -62,7 +62,7 @@ public class Hierarchy {
 		directoryName = moveFile.createDirectory();
 		folderForMonthlyRepotrs = moveFile.createFolder("MONTHLY REPORTS", directoryName);
 		folderForWeeklyRepotrs = moveFile.createFolder("WEEKLY REPORTS", directoryName);
-		folderForQuartalRepotrs = moveFile.createFolder("QUARTAL REPORTS", directoryName);
+		folderForQuarterRepotrs = moveFile.createFolder("QUARTERLY REPORTS", directoryName);
 
 	}
 
@@ -114,7 +114,7 @@ public class Hierarchy {
 			saveFolder = folderForMonthlyRepotrs;
 		} else {
 			this.reportName = "Quarterly";
-			saveFolder = folderForQuartalRepotrs;
+			saveFolder = folderForQuarterRepotrs;
 		}
 		formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 		server = new DbConnProvider();
@@ -145,9 +145,10 @@ public class Hierarchy {
 				}
 			}
 
+			logger.info("Get hierarchy info : OK");
 			generateReport("", hier.get(0).getACC_ID());
 			server.endConn(connection);
-			logger.info("get hierarchy info : OK");
+
 		} else {
 			logger.warning("Log problem with server connection");
 			// TODO
@@ -179,16 +180,16 @@ public class Hierarchy {
 			if (data.size() != 0) {
 
 				for (int i = 0; i < data.size(); i++) {
-					saveACC(book, data.get(i).interest, getNumber(data.get(i).accID), fileName);
+					saveACC(book, data.get(i).interest, getNumber(data.get(i).accID));
 				}
 			}
 			if (book.getNumberOfSheets() != 0) {
 				try {
-					logger.info("File name: " + fileName);
+
 					System.out.println("File name: " + fileName);
 					FileOutputStream fileOut = new FileOutputStream(
 							saveFolder + "/" + fileName + "_" + formatter.format(toDate) + "(" + reportName + ").xls");
-
+					logger.info("File created: " + fileName);
 					book.write(fileOut);
 					fileOut.close();
 				} catch (IOException ex) {
@@ -219,33 +220,31 @@ public class Hierarchy {
 			}
 
 			else {
-				acc_result = dataProvider.quarterEntriesData(accID, from.toString(), to.toString());
+				acc_result = dataProvider.quarterEntriesData(accID, to.toString());
 			}
 
 			if (acc_result.next()) {
-				
+
 				if (acc_result.getString(3).compareTo(toDate.toString()) > 0) {
 					return new ArrayList<Interest>(); // no interest were found
-					
+
 				} else {
 
 					if (acc_result.getString(3).compareTo(fromDate.toString()) > 0) {
 						from = Date.valueOf(acc_result.getString(3)).toLocalDate();
-						
+
 					}
 				}
 			} else
 				return new ArrayList<Interest>();
-			
-			if (reportType == 3) {
-				to = Date.valueOf(acc_result.getString(4)).toLocalDate();
-				while (acc_result.next()) {
-					if (acc_result.getString(4).compareTo(to.toString()) > 0) {
-						from = Date.valueOf(acc_result.getString(3)).toLocalDate();
-					}
-				}
-			}
-			
+
+			/*
+			 * if (reportType == 3) { to =
+			 * Date.valueOf(acc_result.getString(4)).toLocalDate(); while
+			 * (acc_result.next()) { if (acc_result.getString(4).compareTo(to.toString()) >
+			 * 0) { from = Date.valueOf(acc_result.getString(3)).toLocalDate(); } } }
+			 */
+
 		} catch (SQLException ex) {
 			System.err.println("SQLException information");
 			logger.warning("SQLException information");
@@ -265,8 +264,8 @@ public class Hierarchy {
 		return generator.getReport(accID, from, to);
 	}
 
-	private void saveACC(Workbook workbook, ArrayList<Interest> ACCdata, String ACCname, String reportName) {
-		System.out.println(reportName);
+	private void saveACC(Workbook workbook, ArrayList<Interest> ACCdata, String ACCname) {
+		System.out.println(">>>" + reportName);
 
 		Sheet sheet = workbook.createSheet(ACCname);
 		// Create header information
@@ -402,6 +401,7 @@ public class Hierarchy {
 		cell.setCellValue(report.getColum_settleType());
 		cell.setCellStyle(headerCellStyle);
 
+		double creditSum = 0, debitSum = 0;
 		for (int i = 0; i < ACCdata.size(); i++) {
 			row = sheet.createRow(currentRow++);
 			cellcount = 0;
@@ -453,10 +453,12 @@ public class Hierarchy {
 			cell = row.createCell(cellcount++);
 			cell.setCellStyle(calcuStyle);
 			cell.setCellValue(record.getInterestCredit());
+			creditSum += record.getInterestCredit();
 
 			cell = row.createCell(cellcount++);
 			cell.setCellStyle(calcuStyle);
 			cell.setCellValue(record.getInterestDebit());
+			debitSum += record.getInterestDebit();
 
 			cell = row.createCell(cellcount++);
 			cell.setCellStyle(moneyStyle);
@@ -475,11 +477,18 @@ public class Hierarchy {
 			cell.setCellValue(record.getSettleType());
 		}
 
+		row = sheet.createRow(currentRow++);
+		cell = row.createCell(11);
+		cell.setCellStyle(calcuStyle);
+		cell.setCellValue(creditSum);
+		cell = row.createCell(12);
+		cell.setCellStyle(calcuStyle);
+		cell.setCellValue(debitSum);
+
 		for (int i = 0; i < cellcount; i++) { // Auto size columns
 			sheet.autoSizeColumn(i);
 		}
 
-		logger.info("Excel was created for :" + reportName);
 	}
 
 	private class AccountCollection {

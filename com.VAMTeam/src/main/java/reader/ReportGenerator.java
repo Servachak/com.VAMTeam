@@ -269,6 +269,7 @@ public class ReportGenerator {
 		ArrayList<Interest> report = new ArrayList<Interest>();
 		try {
 			ArrayList<Interest> records = getRecords(account, fromDate, toDate);
+			System.out.println("To date  "+toDate);
 			while (toDate.compareTo(fromDate) >= 0) {
 				ArrayList<Interest> dayrecords = getDayRecords(records, fromDate);// select records for current day
 
@@ -290,6 +291,7 @@ public class ReportGenerator {
 					}
 
 				}
+				System.out.println("From date  "+fromDate);
 				fromDate = fromDate.plusDays(1);// next day
 			}
 
